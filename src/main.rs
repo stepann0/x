@@ -1,5 +1,6 @@
 use std::{env, num::ParseIntError};
 use std::panic;
+use std::io;
 
 #[derive(Debug)]
 #[derive(PartialEq)]
@@ -41,7 +42,7 @@ fn main() {
     }));
 
     let args: Vec<String> = env::args().collect();
-    let expr: &str= match args.get(1){
+    let expr: &str = match args.get(1){
         Some(val) => val,
         None => panic!("")
     };
@@ -50,9 +51,22 @@ fn main() {
             panic!("")
         }
         _ => {
-            println!("{}", convert(parse_expr(expr)));
+            do_stuff(expr)
         }
     }
+}
+
+fn do_stuff(expr: &str) {
+    if expr.starts_with(".") { // stdin case
+        let mut input = String::new();
+        io::stdin().read_line(&mut input).unwrap();
+        input = input.strip_suffix("\n").unwrap().to_string();
+
+        let full_expr = format!("{input}{expr}");
+        println!("{}", convert(parse_expr(full_expr.as_ref())));
+        return;
+    }
+    println!("{}", convert(parse_expr(expr)));
 }
 
 fn parse_expr(expr: &str) -> Config {
@@ -68,7 +82,7 @@ fn parse_expr(expr: &str) -> Config {
     if parts.len() > 2 {
         conf.width = match parts[2].parse::<u32>() {
             Ok(n) => n,
-            Err(_) => panic!("Error: Can not parse length")
+            Err(_) => panic!("Error: Can not parse width")
         }
     }
     conf
@@ -85,7 +99,7 @@ fn parse_number(num: &str) -> i64 {
             return n;
         } 
     }
-    panic!("Error: Can not parse number");
+    panic!("Error: Can not parse number `{}`", num);
 }
 
 fn parse_base(base: &str) -> u32 {

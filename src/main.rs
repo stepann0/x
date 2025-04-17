@@ -41,8 +41,8 @@ fn main() {
     }));
 
     let args: Vec<String> = env::args().collect();
-    let expr: &str = match args.get(1) {
-        Some(val) => val,
+    let expr: String = match args.get(1) {
+        Some(val) => val.clone(),
         None => panic!(""),
     };
     match expr.as_ref() {
@@ -53,21 +53,21 @@ fn main() {
     }
 }
 
-fn do_stuff(expr: &str) {
+fn do_stuff(expr: String) {
     // stdin case
     if expr.starts_with(".") {
-        let mut input = String::new();
-        io::stdin().read_line(&mut input).unwrap();
-        input = input.strip_suffix("\n").unwrap().to_string();
-
-        let full_expr = format!("{input}{expr}");
-        println!("{}", convert(parse_expr(full_expr.as_ref())));
+        let lines = io::stdin().lines();
+        for line in lines {
+            let input = line.unwrap();
+            let full_expr = format!("{input}{expr}");
+            println!("{}", convert(parse_expr(full_expr)));
+        }
         return;
     }
     println!("{}", convert(parse_expr(expr)));
 }
 
-fn parse_expr(expr: &str) -> Config {
+fn parse_expr(expr: String) -> Config {
     let parts: Vec<&str> = expr.split(".").collect();
     let mut conf = Config {
         num: 0,
@@ -131,7 +131,7 @@ mod tests {
     #[test]
     fn parse() {
         assert_eq!(
-            parse_expr("0x3333333333333333.10"),
+            parse_expr("0x3333333333333333.10".to_string()),
             Config {
                 num: 3689348814741910323,
                 base: 10,
@@ -139,7 +139,7 @@ mod tests {
             }
         );
         assert_eq!(
-            parse_expr("0xf0f0f0f0f0f0f0f"),
+            parse_expr("0xf0f0f0f0f0f0f0f".to_string()),
             Config {
                 num: 1085102592571150095,
                 base: 2,
@@ -147,7 +147,7 @@ mod tests {
             }
         );
         assert_eq!(
-            parse_expr("0xff00ff00ff00ff.o.32"),
+            parse_expr("0xff00ff00ff00ff.o.32".to_string()),
             Config {
                 num: 71777214294589695,
                 base: 8,
@@ -155,7 +155,7 @@ mod tests {
             }
         );
         assert_eq!(
-            parse_expr("0b111000111000111.d"),
+            parse_expr("0b111000111000111.d".to_string()),
             Config {
                 num: 29127,
                 base: 10,
@@ -163,7 +163,7 @@ mod tests {
             }
         );
         assert_eq!(
-            parse_expr("0b1011001110011001011001.o.25"),
+            parse_expr("0b1011001110011001011001.o.25".to_string()),
             Config {
                 num: 2942553,
                 base: 8,
@@ -171,7 +171,7 @@ mod tests {
             }
         );
         assert_eq!(
-            parse_expr("0b101101111001010111"),
+            parse_expr("0b101101111001010111".to_string()),
             Config {
                 num: 187991,
                 base: 2,
@@ -179,7 +179,7 @@ mod tests {
             }
         );
         assert_eq!(
-            parse_expr("0o1726354.dec.33"),
+            parse_expr("0o1726354.dec.33".to_string()),
             Config {
                 num: 503020,
                 base: 10,
@@ -187,7 +187,7 @@ mod tests {
             }
         );
         assert_eq!(
-            parse_expr("0o233323332.2"),
+            parse_expr("0o233323332.2".to_string()),
             Config {
                 num: 40740570,
                 base: 2,
@@ -199,25 +199,31 @@ mod tests {
     #[test]
     fn convertion() {
         assert_eq!(
-            convert(parse_expr("0x5555555555555555.dec")),
+            convert(parse_expr("0x5555555555555555.dec".to_string())),
             "6148914691236517205"
         );
         assert_eq!(
-            convert(parse_expr("0xffff0000ffff.bin.64")),
+            convert(parse_expr("0xffff0000ffff.bin.64".to_string())),
             "0b00000000000000111111111111111100000000000000001111111111111111"
         );
-        assert_eq!(convert(parse_expr("0b11000000111111.hex")), "0x303f");
-        assert_eq!(convert(parse_expr("0o555555555.x.16")), "0x00000005b6db6d");
         assert_eq!(
-            convert(parse_expr("28384922342543.b.64")),
+            convert(parse_expr("0b11000000111111.hex".to_string())),
+            "0x303f"
+        );
+        assert_eq!(
+            convert(parse_expr("0o555555555.x.16".to_string())),
+            "0x00000005b6db6d"
+        );
+        assert_eq!(
+            convert(parse_expr("28384922342543.b.64".to_string())),
             "0b00000000000000000110011101000011100001001101101001010010001111"
         );
         assert_eq!(
-            convert(parse_expr("0b111111000000.b.32")),
+            convert(parse_expr("0b111111000000.b.32".to_string())),
             "0b000000000000000000111111000000"
         );
         assert_eq!(
-            convert(parse_expr("0o77001133440011")),
+            convert(parse_expr("0o77001133440011".to_string())),
             "0b111111000000001001011011100100000000001001"
         );
     }

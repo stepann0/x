@@ -14,6 +14,11 @@ Examples
 x 0xc0de.b.16 
 0b1100000011011110
 
-x 68716121565.x
-0xfffcccddd
+echo "0b0101
+0xf0c
+0o777" | x .dec
+
+5
+3852
+511
 ```

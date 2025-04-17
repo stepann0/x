@@ -55,16 +55,19 @@ fn main() {
 
 fn do_stuff(expr: String) {
     // stdin case
-    if expr.starts_with(".") {
-        let lines = io::stdin().lines();
-        for line in lines {
-            let input = line.unwrap();
-            let full_expr = format!("{input}{expr}");
-            println!("{}", convert(parse_expr(full_expr)));
+    match expr.starts_with(".") {
+        true => {
+            let lines = io::stdin().lines();
+            for line in lines {
+                let input = line.unwrap();
+                let full_expr = format!("{input}{expr}");
+                println!("{}", convert(parse_expr(full_expr)));
+            }
         }
-        return;
+        false => {
+            println!("{}", convert(parse_expr(expr)));
+        }
     }
-    println!("{}", convert(parse_expr(expr)));
 }
 
 fn parse_expr(expr: String) -> Config {
